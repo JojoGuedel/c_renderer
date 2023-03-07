@@ -1,0 +1,23 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "args": [
+                "\"${workspaceFolder}/src/*.c\"",
+                "-o\"${workspaceFolder}/out/main.exe\"",
+                "-I\"${workspaceFolder}/inc\"", 
+                "-L\"${workspaceFolder}/lib\"",
+                "-lUser32",
+                "-lGdi32",
+                "-lShell32",
+                "-lopengl32",
+                "-lglfw3_mt",
+            ],
+            "command": "clang"
+        }
+    ]
+}
