@@ -16,6 +16,10 @@ float vertices[] = {
     0.3f, 0.3f, 0.0f,
 };
 
+unsigned int indices[] = {
+    0, 1, 2,
+};
+
 unsigned int vertex_shader;
 unsigned int fragment_shader;
 
@@ -23,6 +27,7 @@ unsigned int shader_program;
 
 unsigned int vbo;
 unsigned int vao;
+unsigned int ebo;
 
 char* load_shader_src(const char* path, size_t size) {
     char* buffer = calloc(size, 1);
@@ -112,16 +117,23 @@ void init() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     glVertexAttribPointer(0, sizeof(vertices) / sizeof(float) / 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
+
+    /* setup element buffer*/
+    glGenBuffers(1, &ebo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW); 
 }
 
 void  render() {
-    // glUseProgram(shader_program);
+    glUseProgram(shader_program);
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     glBindVertexArray(vao);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
 int main(int argc, string args[]) {
