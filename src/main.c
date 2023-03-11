@@ -12,9 +12,9 @@
 typedef const char *string;
 
 float vertices[] = {
-    -0.3f, -0.3f, 0.0f, 
-    -0.3f, 0.3f, 0.0f, 
-    0.3f, 0.3f, 0.0f,
+    -0.3f, -0.3f, 0.0f, 1.0f, 0.0f, 0.0f,
+    -0.3f, 0.3f, 0.0f, 0.0f, 1.0f, 0.0f,
+    0.3f, 0.3f, 0.0f, 0.0f, 0.0f, 1.0f,
 };
 
 unsigned int indices[] = {
@@ -60,11 +60,17 @@ void init() {
     glBindVertexArray(vao);
     
     /* setup vertex buffer*/
+    int vertices_count = sizeof(vertices) / sizeof(float) / 6;
+
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, sizeof(vertices) / sizeof(float) / 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+    /* positions */
+    glVertexAttribPointer(0, vertices_count, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    /* colors */
+    glVertexAttribPointer(1, vertices_count, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     /* setup element buffer*/
     glGenBuffers(1, &ebo);
@@ -80,8 +86,9 @@ void  render() {
 
     glBindVertexArray(vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    /* normal (GL_FILL) / wireframe (GL_LINE) mode */
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 }
 
 int main(int argc, string args[]) {
