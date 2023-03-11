@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "shader.h"
 #include "glad/gl.h"
 #include "GLFW/glfw3.h"
 
@@ -20,36 +21,11 @@ unsigned int indices[] = {
     0, 1, 2,
 };
 
-unsigned int vertex_shader;
-unsigned int fragment_shader;
-
-unsigned int shader_program;
+shader* shader_program;
 
 unsigned int vbo;
 unsigned int vao;
 unsigned int ebo;
-
-char* load_shader_src(const char* path) {
-    FILE* file;
-
-    if(fopen_s(&file, path, "rb")) {
-        printf("[Error]: Could not open '%s'.\n", path);
-        return NULL;
-    }
-
-    fseek(file, 0L, SEEK_END);
-    int size = ftell(file); 
-    char* buffer = malloc(size + 1);
-    buffer[size] = '\0';
-
-    rewind(file);
-    fread(buffer, 1, size, file);
-    fclose(file);
-
-    printf("[Info] - loading shader: \n%s\n", buffer);
-
-    return buffer;
-}
 
 void key_cb(GLFWwindow *window, int key, int scancode, int action, int mods) {
     printf("[Info] - keypress: (%c,%i,%i,%i)\n", key, scancode, action, mods);
@@ -76,41 +52,8 @@ void GLAPIENTRY gl_debug_cb(
     );
 }
 
-void check_error(GLuint shader, GLenum name) {
-    int success;
-    char infoLog[512];
-
-    glGetShaderiv(shader, name, &success);
-    if (!success) {
-        glGetShaderInfoLog(shader, 512, NULL, infoLog);
-        printf("[Error] - opengl shader: %s\n", infoLog);
-    }
-}
-
 void init() {
-    /* setup vertex shader */
-    const char* vertex_shader_src = load_shader_src("./src/shader/main.vert");
-    vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex_shader, 1, &vertex_shader_src, NULL);
-    glCompileShader(vertex_shader);
-    free((char*)vertex_shader_src);
-    check_error(vertex_shader, GL_COMPILE_STATUS);
-
-    /* setup fragment shader */
-    const char* fragment_shader_src = load_shader_src("./src/shader/main.frag");
-    fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment_shader, 1, &fragment_shader_src, NULL);
-    glCompileShader(fragment_shader);
-    free((char*) fragment_shader_src);
-    check_error(fragment_shader, GL_COMPILE_STATUS);
-    
-    /* setup shader program */
-    shader_program = glCreateProgram();
-    glAttachShader(shader_program, vertex_shader);
-    glAttachShader(shader_program, fragment_shader);
-    glLinkProgram(shader_program);
-    glDeleteShader(vertex_shader);
-    glDeleteShader(fragment_shader);
+    shader_program = shader_create("./src/shader/main.vert", "./src/shader/main.frag");
 
     /* setup vertex array */
     glGenVertexArrays(1, &vao);
@@ -130,7 +73,7 @@ void init() {
 }
 
 void  render() {
-    glUseProgram(shader_program);
+    shader_use(shader_program);
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -170,12 +113,18 @@ int main(int argc, string args[]) {
 
     init();
 
+    int n;
+    glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &n);
+    printf("[Info]: Maximum nr of vertex attributes supported: %i\n", n);
+
     while (!glfwWindowShouldClose(window)) {
         render();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+
+    shader_destroy(shader_program);
 
     glfwTerminate();
 
