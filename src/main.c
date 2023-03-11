@@ -29,8 +29,7 @@ unsigned int vbo;
 unsigned int vao;
 unsigned int ebo;
 
-char* load_shader_src(const char* path, size_t size) {
-    char* buffer = calloc(size, 1);
+char* load_shader_src(const char* path) {
     FILE* file;
 
     if(fopen_s(&file, path, "rb")) {
@@ -38,6 +37,12 @@ char* load_shader_src(const char* path, size_t size) {
         return NULL;
     }
 
+    fseek(file, 0L, SEEK_END);
+    int size = ftell(file); 
+    char* buffer = malloc(size + 1);
+    buffer[size] = '\0';
+
+    rewind(file);
     fread(buffer, 1, size, file);
     fclose(file);
 
@@ -84,7 +89,7 @@ void check_error(GLuint shader, GLenum name) {
 
 void init() {
     /* setup vertex shader */
-    const char* vertex_shader_src = load_shader_src("./src/shader/main.vert", 200);
+    const char* vertex_shader_src = load_shader_src("./src/shader/main.vert");
     vertex_shader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex_shader, 1, &vertex_shader_src, NULL);
     glCompileShader(vertex_shader);
@@ -92,7 +97,7 @@ void init() {
     check_error(vertex_shader, GL_COMPILE_STATUS);
 
     /* setup fragment shader */
-    const char* fragment_shader_src = load_shader_src("./src/shader/main.frag", 200);
+    const char* fragment_shader_src = load_shader_src("./src/shader/main.frag");
     fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragment_shader, 1, &fragment_shader_src, NULL);
     glCompileShader(fragment_shader);
