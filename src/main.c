@@ -9,8 +9,6 @@
 #include "glad/gl.h"
 #include "GLFW/glfw3.h"
 
-typedef const char *string;
-
 float vertices[] = {
     -0.3f, -0.3f, 0.0f, 1.0f, 0.0f, 0.0f,
     -0.3f, 0.3f, 0.0f, 0.0f, 1.0f, 0.0f,
@@ -21,7 +19,7 @@ unsigned int indices[] = {
     0, 1, 2,
 };
 
-shader* shader_program;
+Shader shader_program;
 
 unsigned int vbo;
 unsigned int vao;
@@ -91,7 +89,7 @@ void  render() {
     glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
 }
 
-int main(int argc, string args[]) {
+int main(int argc, const char* args[]) {
     GLFWwindow *window;
 
     if (!glfwInit()) {

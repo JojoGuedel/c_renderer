@@ -3,7 +3,7 @@
 #include "glad/gl.h"
 #include "shader.h"
 
-char* _load_src(const char* path) {
+static char* _load_src(const char* path) {
     FILE* file;
 
     if(fopen_s(&file, path, "rb")) {
@@ -25,7 +25,7 @@ char* _load_src(const char* path) {
     return buffer;
 }
 
-void _check_shader_error(GLuint shader) {
+static void _check_shader_error(GLuint shader) {
     int success;
     char infoLog[512];
 
@@ -36,7 +36,7 @@ void _check_shader_error(GLuint shader) {
     }
 }
 
-void _check_program_error(GLuint program) {
+static void _check_program_error(GLuint program) {
     int success;
     char infoLog[512];
 
@@ -47,9 +47,7 @@ void _check_program_error(GLuint program) {
     }
 }
 
-shader* shader_create(const char* vert_path, const char* frag_path) {
-    shader* s = malloc(sizeof(shader));
-
+Shader shader_create(const char* vert_path, const char* frag_path) {
     /* setup vertex shader */
     const char* vert_src = _load_src(vert_path);
     int vert = glCreateShader(GL_VERTEX_SHADER);
@@ -67,35 +65,23 @@ shader* shader_create(const char* vert_path, const char* frag_path) {
     _check_shader_error(frag);
 
     /* setup shader program */
-    s->id = glCreateProgram();
-    glAttachShader(s->id, vert);
-    glAttachShader(s->id, frag);
+    int id = glCreateProgram();
+    glAttachShader(id, vert);
+    glAttachShader(id, frag);
 
-    glLinkProgram(s->id);
-    _check_program_error(s->id);
+    glLinkProgram(id);
+    _check_program_error(id);
     
     glDeleteShader(vert);
     glDeleteShader(frag);
 
-    return s;
+    return (Shader) { id };
 }
 
-void shader_destroy(shader *shader) {
-    free(shader);
+void shader_use(Shader shader) {
+    glUseProgram(shader.id);
 }
 
-void shader_use(shader* shader) {
-    glUseProgram(shader->id);
-}
-
-void shader_set_bool(shader* shader, const char* name, bool value) {
-    glUniform1i(glGetUniformLocation(shader->id, name), value); 
-}
-
-void shader_set_int(shader* shader, const char* name, int value) {
-    glUniform1i(glGetUniformLocation(shader->id, name), value);
-}
-
-void shader_set_float(shader* shader, const char* name, float value) {
-    glUniform1f(glGetUniformLocation(shader->id, name), value);
+void shader_destroy(Shader shader) {
+    glDeleteProgram(shader.id);
 }

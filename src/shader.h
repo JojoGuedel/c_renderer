@@ -5,14 +5,11 @@
 
 typedef struct {
     int id;
-} shader;
+} Shader;
 
-shader* shader_create(const char* vert_path, const char* frag_path);
-void shader_destroy(shader* shader);
+Shader shader_create(const char* vert_path, const char* frag_path);
+void shader_destroy(Shader shader);
 
-void shader_use(shader* shader);
-void shader_set_bool(shader* shader, const char* name, bool value);
-void shader_set_int(shader* shader, const char* name, int value);
-void shader_set_float(shader* shader, const char* name, float value);
+void shader_use(Shader shader);
 
 #endif
