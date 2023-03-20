@@ -77,7 +77,7 @@ void init() {
 }
 
 void  render() {
-    shader_use(shader_program);
+    shader_use(&shader_program);
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -96,7 +96,7 @@ int main(int argc, const char* args[]) {
         return -1;
     }
 
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(640, 480, "c_renderer", NULL, NULL);
 
     if (!window) {
         glfwTerminate();
@@ -129,7 +129,7 @@ int main(int argc, const char* args[]) {
         glfwPollEvents();
     }
 
-    shader_destroy(shader_program);
+    shader_destroy(&shader_program);
 
     glfwTerminate();
 

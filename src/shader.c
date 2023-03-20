@@ -78,10 +78,10 @@ Shader shader_create(const char* vert_path, const char* frag_path) {
     return (Shader) { id };
 }
 
-void shader_use(Shader shader) {
-    glUseProgram(shader.id);
+void shader_use(Shader* shader) {
+    glUseProgram(shader->id);
 }
 
-void shader_destroy(Shader shader) {
-    glDeleteProgram(shader.id);
+void shader_destroy(Shader* shader) {
+    glDeleteProgram(shader->id);
 }
